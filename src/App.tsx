@@ -1,13 +1,9 @@
 import { Routes, Route, Navigate, NavLink, useParams, useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
-  Home,
-  Rocket,
-  BookOpen,
   Search,
   Moon,
   Sun,
-  FileText,
   ChevronRight,
   Play,
 } from "lucide-react";
@@ -75,12 +71,6 @@ for (const g of groupKeys) {
 function sectionEntries(group: string): DocEntry[] {
   return docEntries.filter((e) => e.group === group);
 }
-
-const iconMap: Record<string, React.ReactNode> = {
-  index: <Home size={18} />,
-  "getting-started": <Rocket size={18} />,
-  "api-reference": <BookOpen size={18} />,
-};
 
 const getStartedLanding =
   sections.find((s) => s.key.includes("getting-started"))?.landing ?? "index";
@@ -211,9 +201,6 @@ function ExpandableSearch({ onSelect }: { onSelect: (slug: string) => void }) {
                 }}
                 className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm text-foreground hover:bg-accent"
               >
-                <span className="shrink-0 text-muted-foreground">
-                  {iconMap[entry.slug] || <FileText size={16} />}
-                </span>
                 <span className="truncate">{entry.title}</span>
               </button>
             ))}
@@ -282,7 +269,6 @@ function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
                     }`
                   }
                 >
-                  <span className="shrink-0">{iconMap[entry.slug] || <FileText size={15} />}</span>
                   <span className="truncate">{entry.title}</span>
                 </NavLink>
               ))}
