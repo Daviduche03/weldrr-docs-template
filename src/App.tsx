@@ -6,6 +6,8 @@ import {
   Sun,
   ChevronRight,
   Play,
+  Menu,
+  X,
 } from "lucide-react";
 import { Playground } from "./components/playground";
 import { useBrandingConfig, brandLogoUrl, type BrandingConfig } from "./branding";
@@ -233,10 +235,9 @@ function ThemeToggle() {
 
 /* -------------------------------- Sidebar -------------------------------- */
 
-function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
+function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
   return (
-    <aside className="sticky top-[6.75rem] hidden h-[calc(100vh-6.75rem)] w-60 shrink-0 overflow-y-auto border-r border-border lg:block">
-      <nav className="space-y-1 p-4">
+    <nav className="space-y-1 p-4">
         <div className="px-3 pb-1 pt-1 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
           Pages
         </div>
@@ -293,7 +294,52 @@ function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
           <span className="truncate">Playground</span>
         </NavLink>
       </nav>
+  );
+}
+
+function Sidebar() {
+  return (
+    <aside className="sticky top-[6.75rem] hidden h-[calc(100vh-6.75rem)] w-60 shrink-0 overflow-y-auto border-r border-border lg:block">
+      <SidebarNav />
     </aside>
+  );
+}
+
+function MobileDrawer({ onClose }: { onClose: () => void }) {
+  const config = useBrandingConfig();
+
+  useEffect(() => {
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previous;
+    };
+  }, []);
+
+  return (
+    <div className="fixed inset-0 z-[60] lg:hidden">
+      <div
+        className="absolute inset-0 bg-black/30 backdrop-blur-sm dark:bg-black/60"
+        onClick={onClose}
+        role="presentation"
+      />
+      <aside className="absolute inset-y-0 left-0 flex w-[19rem] max-w-[86vw] flex-col border-r border-border bg-background shadow-2xl">
+        <div className="flex h-16 shrink-0 items-center justify-between border-b border-border px-4">
+          <Brand config={config} />
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close navigation"
+            className="inline-flex size-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+          >
+            <X size={16} />
+          </button>
+        </div>
+        <div className="flex-1 overflow-y-auto">
+          <SidebarNav onNavigate={onClose} />
+        </div>
+      </aside>
+    </div>
   );
 }
 
@@ -409,12 +455,25 @@ export default function App() {
   const location = useLocation();
   const config = useBrandingConfig();
   const isPlayground = location.pathname.startsWith("/docs/playground");
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
+  useEffect(() => {
+    setDrawerOpen(false);
+  }, [location.pathname]);
 
   return (
     <div className="min-h-screen bg-background text-foreground">
       {/* Header */}
       <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur">
         <div className="flex h-16 items-center justify-between gap-4 px-5 sm:px-8">
+          <button
+            type="button"
+            onClick={() => setDrawerOpen(true)}
+            aria-label="Open navigation"
+            className="-ml-1 inline-flex size-8 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground lg:hidden"
+          >
+            <Menu size={17} />
+          </button>
           <Brand config={config} />
           <ExpandableSearch onSelect={(slug) => navigate(`/docs/${slug}`)} />
           <div className="flex shrink-0 items-center gap-2">
@@ -459,6 +518,8 @@ export default function App() {
           <Route path="*" element={<Navigate to="/docs/index" replace />} />
         </Routes>
       </div>
+
+      {drawerOpen && <MobileDrawer onClose={() => setDrawerOpen(false)} />}
     </div>
   );
 }
