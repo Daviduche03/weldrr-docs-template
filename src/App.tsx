@@ -338,7 +338,7 @@ function OnThisPage({ toc }: { toc: TocItem[] }) {
 
 function DocShell() {
   const { "*": splat } = useParams();
-  const slug = splat || "index";
+  const slug = (splat || "index").replace(/\/+$/, "") || "index";
   const articleRef = useRef<HTMLElement>(null);
   const [toc, setToc] = useState<TocItem[]>([]);
   const config = useBrandingConfig();
